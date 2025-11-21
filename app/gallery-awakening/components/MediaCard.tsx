@@ -3,9 +3,12 @@
 import React, { useRef, useState } from 'react';
 import type { MediaItem } from '../mediaTypes';
 import { getR2Url } from '../r2';
+import { formatMediaTitle } from '../formatMediaTitle';
+import { useEffectOnce } from '../useEffectOnce';
 
 interface MediaCardProps {
   item: MediaItem;
+  onPreview?: (item: MediaItem) => void;
 }
 
 const normalizeLocalPath = (p?: string) => {
@@ -13,10 +16,18 @@ const normalizeLocalPath = (p?: string) => {
   return p.startsWith('http') ? p : `/${p.replace(/^\/+/, '')}`;
 };
 
-export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
+export const MediaCard: React.FC<MediaCardProps> = ({ item, onPreview }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [imageBroken, setImageBroken] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const displayTitle = formatMediaTitle(item.title);
+
+  // Ensure videos start muted by default.
+  useEffectOnce(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = 0;
+    }
+  });
 
   const videoSrc = item.localPath
     ? normalizeLocalPath(item.localPath)
@@ -47,19 +58,23 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
         : '/placeholder-gallery-image.png';
 
     return (
-      <img
-        src={src}
-        alt={item.title}
-        className="w-full h-auto rounded-xl bg-black"
-        onError={() => setImageBroken(true)}
-      />
+      <div className="relative">
+        <img
+          src={src}
+          alt={displayTitle}
+          className="h-auto w-full cursor-pointer rounded-xl transition hover:opacity-90"
+          onClick={() => onPreview?.(item)}
+          onError={() => setImageBroken(true)}
+        />
+        {renderDetailsOverlay()}
+      </div>
     );
   };
 
   const renderVideoPreviewStrip = () => {
     if (!item.thumbnails || item.thumbnails.length === 0) {
       return (
-        <p className="mt-1 text-[10px] text-zinc-500">
+        <p className="mt-1 text-[10px] text-base-content/60">
           No preview thumbnails yet. Mark this video to generate more thumbs later.
         </p>
       );
@@ -77,8 +92,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
             <img
               key={thumb.index}
               src={thumbSrc}
-              alt={`${item.title} preview ${thumb.index}`}
-              className="h-10 w-14 flex-none rounded-md border border-zinc-800 object-cover"
+              alt={`${displayTitle} preview ${thumb.index}`}
+              className="h-10 w-14 flex-none rounded-md border border-base-300 object-cover"
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.src = '/placeholder-gallery-image.png';
@@ -93,7 +108,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
   const renderVideoBody = () => {
     if (!videoSrc) {
       return (
-        <div className="flex h-40 w-full items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-zinc-900/80 text-[11px] text-zinc-400">
+        <div className="flex h-40 w-full items-center justify-center rounded-xl border border-dashed border-base-300 text-[11px] text-base-content/60">
           Video path is missing. Check your Gallery metadata or Sync Center.
         </div>
       );
@@ -101,7 +116,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
 
     if (videoError) {
       return (
-        <div className="flex h-40 w-full items-center justify-center rounded-xl border border-dashed border-zinc-700 bg-zinc-900/80 text-[11px] text-zinc-400">
+        <div className="flex h-40 w-full items-center justify-center rounded-xl border border-dashed border-base-300 text-[11px] text-base-content/60">
           GAIA could not load this video. Make sure the file exists and the path is correct.
         </div>
       );
@@ -111,58 +126,79 @@ export const MediaCard: React.FC<MediaCardProps> = ({ item }) => {
       <video
         ref={videoRef}
         src={videoSrc}
-        className="w-full h-auto rounded-xl bg-black"
+        className="h-auto w-full rounded-xl"
         controls
         onError={() => setVideoError(true)}
       />
     );
   };
 
-  const sourceLabel = item.source?.startsWith('r2') ? 'R2' : 'Local';
+  const renderDetailsOverlay = () => {
+    return (
+      <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="flex justify-end">
+          <div className="pointer-events-auto rounded-full bg-base-100/90 px-2 py-1 text-base font-semibold text-base-content shadow">
+            …
+          </div>
+        </div>
+        <div className="pointer-events-auto mt-2 max-w-full space-y-1 rounded-xl bg-base-100/95 p-3 text-[11px] text-base-content shadow-lg">
+          <p className="font-semibold">{displayTitle}</p>
+          {item.description &&
+            item.description !== 'Gallery image' &&
+            item.description !== 'Local video asset' &&
+            item.description !== 'Cloudflare R2 video asset' && (
+            <p className="text-base-content/70">{item.description}</p>
+          )}
+          {item.tags?.length ? (
+            <p className="text-[10px] text-base-content/60">
+              Tags: {item.tags.join(', ')}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800/60 bg-gradient-to-br from-zinc-950/80 via-zinc-900/70 to-emerald-950/20 p-3 shadow-lg shadow-black/30 transition duration-200 hover:-translate-y-[2px] hover:border-emerald-700/60 hover:shadow-emerald-900/30 backdrop-blur">
-      <div className="absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 pointer-events-none bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-700/10" />
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-transparent p-1 transition duration-200" aria-label={displayTitle}>
 
       {/* Minimal header removed to keep cards clean. */}
 
       {item.type === 'image' ? (
-        <div className="relative mb-3 overflow-hidden rounded-xl bg-zinc-800/80">
+        <div className="relative mb-3 overflow-hidden rounded-xl border border-base-300">
           {/* Still simple <img>; later we can switch to Next/Image. */}
           {renderImage()}
         </div>
       ) : (
         <div className="mb-3 space-y-2">
-          <div className="relative overflow-hidden rounded-xl bg-black">
-            {renderVideoBody()}
+          <div className="relative overflow-hidden rounded-xl border border-base-300">
+            <div className="relative">
+              {renderVideoBody()}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-2 opacity-0 transition-opacity duration-200 hover:opacity-100">
+                <button
+                  type="button"
+                  className="pointer-events-auto rounded-full bg-base-100/80 px-2 py-1 text-[11px] font-semibold text-base-content shadow"
+                  onClick={() => handleSkip(-10)}
+                  aria-label="Skip backward 10 seconds"
+                >
+                  ‹ 10s
+                </button>
+                <button
+                  type="button"
+                  className="pointer-events-auto rounded-full bg-base-100/80 px-2 py-1 text-[11px] font-semibold text-base-content shadow"
+                  onClick={() => handleSkip(10)}
+                  aria-label="Skip forward 10 seconds"
+                >
+                  10s ›
+                </button>
+              </div>
+              {renderDetailsOverlay()}
+            </div>
           </div>
-          {/* Video controls will be driven by keyboard shortcuts later; buttons hidden for now. */}
           {/* Video preview strip powered by R2 thumbnails */}
           {renderVideoPreviewStrip()}
         </div>
       )}
-
-      <div className="relative mt-auto">
-        <h3 className="text-sm font-semibold text-zinc-50 line-clamp-2">{item.title}</h3>
-        {item.description &&
-          item.description !== 'Gallery image' &&
-          item.description !== 'Local video asset' &&
-          item.description !== 'Cloudflare R2 video asset' && (
-          <p className="mt-1 text-xs text-zinc-400 line-clamp-3">{item.description}</p>
-        )}
-        {item.tags?.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {item.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-zinc-800/80 px-2 py-0.5 text-[10px] font-medium text-zinc-300"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

@@ -162,8 +162,7 @@ const DashboardFeatureCard: React.FC<DashboardFeatureCardProps> = ({
   }, []);
 
   const rootClasses =
-    "rounded-xl border bg-black/5 p-4 shadow-sm flex flex-col gap-3 " +
-    "border-emerald-900/40 bg-gradient-to-b from-black/40 to-emerald-900/10";
+    "rounded-xl border border-base-300 bg-base-100 p-4 shadow-sm flex flex-col gap-3";
 
   const badgeLabel = (() => {
     if (!autoBox?.item) return null;
@@ -185,34 +184,34 @@ const DashboardFeatureCard: React.FC<DashboardFeatureCardProps> = ({
       <header className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-emerald-300">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-primary">
               Gallery · Auto Feature
             </p>
             {badgeLabel && (
-              <span className="inline-flex items-center rounded-full border border-emerald-500/60 px-2 py-[1px] text-[10px] uppercase tracking-wide text-emerald-100 bg-black/40">
+              <span className="inline-flex items-center rounded-full border border-primary/60 bg-primary/10 px-2 py-[1px] text-[10px] uppercase tracking-wide text-primary">
                 {badgeLabel}
               </span>
             )}
           </div>
-          <h2 className="text-sm font-semibold text-zinc-50">
+          <h2 className="text-sm font-semibold text-base-content">
             Today&apos;s highlight
           </h2>
           {autoBox?.description && (
-            <p className="text-[11px] text-zinc-400 max-w-xs">
+            <p className="text-[11px] text-base-content/70 max-w-xs">
               {autoBox.description}
             </p>
           )}
         </div>
         <a
           href="/gallery-awakening"
-          className="inline-flex items-center justify-center rounded-md border border-emerald-500/60 px-2.5 py-1 text-[11px] font-medium text-emerald-100 hover:bg-emerald-500/10"
+          className="inline-flex items-center justify-center rounded-md border border-primary/60 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/20"
         >
           Open Gallery
         </a>
       </header>
 
       {loading && (
-        <p className="text-[11px] text-zinc-400">
+        <p className="text-[11px] text-base-content/70">
           Loading today&apos;s feature…
         </p>
       )}
@@ -220,8 +219,8 @@ const DashboardFeatureCard: React.FC<DashboardFeatureCardProps> = ({
       {error && !loading && <p className="text-[11px] text-red-500">{error}</p>}
 
       {!loading && !error && autoBox && !autoBox.item && (
-        <div className="rounded-lg border border-dashed border-zinc-700/70 bg-zinc-950/60 p-3 text-[11px] text-zinc-400">
-          <p className="font-medium text-zinc-200">No feature yet</p>
+        <div className="rounded-lg border border-dashed border-base-300 bg-base-100 p-3 text-[11px] text-base-content/70">
+          <p className="font-medium text-base-content">No feature yet</p>
           <p className="mt-1">
             Once you have media items in your Gallery (R2 images or local
             videos), GAIA will surface one here as a small daily highlight.

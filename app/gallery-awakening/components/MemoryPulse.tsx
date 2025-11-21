@@ -63,71 +63,71 @@ export const MemoryPulse: React.FC<MemoryPulseProps> = ({ items }) => {
   }, [items, now]);
 
   return (
-    <section className="space-y-3 rounded-3xl border border-emerald-900/60 bg-gradient-to-br from-zinc-950 via-zinc-950/90 to-emerald-950/30 p-4 text-xs text-zinc-200 shadow-sm">
+    <section className="space-y-3 rounded-3xl border border-base-300 bg-base-100 p-4 text-xs text-base-content shadow-sm">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-400">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
             Memory Pulse
           </p>
-          <p className="text-xs text-zinc-300">
+          <p className="text-xs text-base-content/70">
             A quick heartbeat from your Gallery, ready to link with the Daily Thread later.
           </p>
         </div>
-        <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] text-emerald-200">
+        <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] text-primary">
           {summary.total} memories
         </span>
       </header>
 
       {summary.total === 0 ? (
-        <p className="text-[11px] text-zinc-400">
+        <p className="text-[11px] text-base-content/70">
           Once you add images and videos, GAIA will start summarising what kind of memories you are
           collecting this month and across your timeline.
         </p>
       ) : (
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="space-y-1 rounded-2xl bg-zinc-950/70 p-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+          <div className="space-y-1 rounded-2xl bg-base-200 p-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-base-content/60">
               This Month
             </p>
-            <p className="text-base font-semibold text-emerald-200">{summary.thisMonth}</p>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-base font-semibold text-primary">{summary.thisMonth}</p>
+            <p className="text-[11px] text-base-content/70">
               Memories captured in this calendar month of any year.
             </p>
           </div>
-          <div className="space-y-1 rounded-2xl bg-zinc-950/70 p-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+          <div className="space-y-1 rounded-2xl bg-base-200 p-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-base-content/60">
               This Year
             </p>
-            <p className="text-base font-semibold text-emerald-200">{summary.thisYear}</p>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-base font-semibold text-primary">{summary.thisYear}</p>
+            <p className="text-[11px] text-base-content/70">
               New additions in the current year. Future Daily Thread can sync with this.
             </p>
           </div>
-          <div className="space-y-1 rounded-2xl bg-zinc-950/70 p-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+          <div className="space-y-1 rounded-2xl bg-base-200 p-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-base-content/60">
               Nostalgia Week
             </p>
-            <p className="text-base font-semibold text-emerald-200">{summary.nostalgiaWeek}</p>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-base font-semibold text-primary">{summary.nostalgiaWeek}</p>
+            <p className="text-[11px] text-base-content/70">
               Memories from this week across years – perfect for &ldquo;from this week then&rdquo;
               prompts in the Daily Thread.
             </p>
           </div>
-          <div className="space-y-1 rounded-2xl bg-zinc-950/70 p-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+          <div className="space-y-1 rounded-2xl bg-base-200 p-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-base-content/60">
               Power Tagged
             </p>
-            <p className="text-base font-semibold text-emerald-200">{summary.powerTagged}</p>
-            <p className="text-[11px] text-zinc-400">
-              Images or videos tagged as <span className="font-semibold text-emerald-300">power</span>.
+            <p className="text-base font-semibold text-primary">{summary.powerTagged}</p>
+            <p className="text-[11px] text-base-content/70">
+              Images or videos tagged as <span className="font-semibold text-primary">power</span>.
             </p>
           </div>
-          <div className="space-y-1 rounded-2xl bg-zinc-950/70 p-3">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+          <div className="space-y-1 rounded-2xl bg-base-200 p-3">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-base-content/60">
               Favorites
             </p>
-            <p className="text-base font-semibold text-emerald-200">{summary.favorites}</p>
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-base font-semibold text-primary">{summary.favorites}</p>
+            <p className="text-[11px] text-base-content/70">
               Memories you explicitly marked as favorites – good candidates for Daily Thread anchors.
             </p>
           </div>

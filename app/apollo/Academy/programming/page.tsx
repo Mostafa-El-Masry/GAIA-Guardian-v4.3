@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAcademyProgress } from "../useAcademyProgress";
-import { programmingLessons } from "../lessonsMap";
+import { programmingLessons, type TrackId } from "../lessonsMap";
 import ProgrammingLessonContent from "./lessonContent";
 
 type Lesson = {
@@ -159,7 +159,7 @@ const arcFilters: { id: "all" | Section["id"]; label: string }[] = [
 function isLessonLocked(
   lesson: Lesson,
   allLessons: Lesson[],
-  isLessonCompleted: (trackId: string, lessonId: string) => boolean
+  isLessonCompleted: (trackId: TrackId, lessonId: string) => boolean
 ): boolean {
   const index = allLessons.findIndex((l) => l.id === lesson.id);
   if (index <= 0) return false;

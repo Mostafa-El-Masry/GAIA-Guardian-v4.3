@@ -53,9 +53,9 @@ const sections: Section[] = [
     focus:
       "See the whole map: how the web works, your tools, and a learning rhythm that respects your energy.",
     lessons: [
-      makeLesson("1.1", "30–45 min", "foundations"),
-      makeLesson("1.2", "45–60 min", "foundations"),
-      makeLesson("1.3", "45–60 min", "foundations"),
+      makeLesson("1.1", "30-45 min", "foundations"),
+      makeLesson("1.2", "45-60 min", "foundations"),
+      makeLesson("1.3", "45-60 min", "foundations"),
     ],
   },
   {
@@ -65,11 +65,11 @@ const sections: Section[] = [
     focus:
       "Learn how to structure pages with clean, semantic HTML that GAIA can understand easily later.",
     lessons: [
-      makeLesson("2.1", "45–60 min", "html"),
-      makeLesson("2.2", "60–90 min", "html"),
-      makeLesson("2.3", "60–90 min", "html"),
-      makeLesson("2.4", "60–90 min", "html"),
-      makeLesson("2.5", "45–60 min", "html"),
+      makeLesson("2.1", "45-60 min", "html"),
+      makeLesson("2.2", "60-90 min", "html"),
+      makeLesson("2.3", "60-90 min", "html"),
+      makeLesson("2.4", "60-90 min", "html"),
+      makeLesson("2.5", "45-60 min", "html"),
     ],
   },
   {
@@ -79,12 +79,12 @@ const sections: Section[] = [
     focus:
       "Control layout, spacing, and typography, then move into faster styling with Tailwind.",
     lessons: [
-      makeLesson("3.1", "60–90 min", "css"),
-      makeLesson("3.2", "60–90 min", "css"),
-      makeLesson("3.3", "60–90 min", "css"),
-      makeLesson("3.4", "60–90 min", "css"),
-      makeLesson("3.5", "60–90 min", "css"),
-      makeLesson("3.6", "60–90 min", "css"),
+      makeLesson("3.1", "60-90 min", "css"),
+      makeLesson("3.2", "60-90 min", "css"),
+      makeLesson("3.3", "60-90 min", "css"),
+      makeLesson("3.4", "60-90 min", "css"),
+      makeLesson("3.5", "60-90 min", "css"),
+      makeLesson("3.6", "60-90 min", "css"),
     ],
   },
   {
@@ -94,13 +94,13 @@ const sections: Section[] = [
     focus:
       "Build the logic layer so you can interact with users, data, and APIs in GAIA-style apps.",
     lessons: [
-      makeLesson("4.1", "60–90 min", "javascript"),
-      makeLesson("4.2", "60–90 min", "javascript"),
-      makeLesson("4.3", "60–90 min", "javascript"),
-      makeLesson("4.4", "60–90 min", "javascript"),
-      makeLesson("4.5", "60–90 min", "javascript"),
-      makeLesson("4.6", "60–90 min", "javascript"),
-      makeLesson("4.7", "60–90 min", "javascript"),
+      makeLesson("4.1", "60-90 min", "javascript"),
+      makeLesson("4.2", "60-90 min", "javascript"),
+      makeLesson("4.3", "60-90 min", "javascript"),
+      makeLesson("4.4", "60-90 min", "javascript"),
+      makeLesson("4.5", "60-90 min", "javascript"),
+      makeLesson("4.6", "60-90 min", "javascript"),
+      makeLesson("4.7", "60-90 min", "javascript"),
     ],
   },
   {
@@ -110,11 +110,11 @@ const sections: Section[] = [
     focus:
       "Move from static pages to interactive apps using React and Next.js like GAIA itself.",
     lessons: [
-      makeLesson("5.1", "60–90 min", "react-next"),
-      makeLesson("5.2", "60–90 min", "react-next"),
-      makeLesson("5.3", "60–90 min", "react-next"),
-      makeLesson("5.4", "60–90 min", "react-next"),
-      makeLesson("5.5", "60–90 min", "react-next"),
+      makeLesson("5.1", "60-90 min", "react-next"),
+      makeLesson("5.2", "60-90 min", "react-next"),
+      makeLesson("5.3", "60-90 min", "react-next"),
+      makeLesson("5.4", "60-90 min", "react-next"),
+      makeLesson("5.5", "60-90 min", "react-next"),
     ],
   },
   {
@@ -124,10 +124,10 @@ const sections: Section[] = [
     focus:
       "Store your data remotely and keep it in sync, just like GAIA Awakening will do.",
     lessons: [
-      makeLesson("6.1", "60–90 min", "supabase"),
-      makeLesson("6.2", "60–90 min", "supabase"),
-      makeLesson("6.3", "60–90 min", "supabase"),
-      makeLesson("6.4", "60–90 min", "supabase"),
+      makeLesson("6.1", "60-90 min", "supabase"),
+      makeLesson("6.2", "60-90 min", "supabase"),
+      makeLesson("6.3", "60-90 min", "supabase"),
+      makeLesson("6.4", "60-90 min", "supabase"),
     ],
   },
   {
@@ -137,10 +137,10 @@ const sections: Section[] = [
     focus:
       "Plan, build, and polish a small GAIA-style app and connect it into the main system.",
     lessons: [
-      makeLesson("7.1", "60–90 min", "capstone"),
-      makeLesson("7.2", "60–120 min", "capstone"),
-      makeLesson("7.3", "60–120 min", "capstone"),
-      makeLesson("7.4", "60–120 min", "capstone"),
+      makeLesson("7.1", "60-90 min", "capstone"),
+      makeLesson("7.2", "60-120 min", "capstone"),
+      makeLesson("7.3", "60-120 min", "capstone"),
+      makeLesson("7.4", "60-120 min", "capstone"),
     ],
   },
 ];
@@ -216,14 +216,14 @@ export default function ProgrammingTrackPage() {
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.22em] gaia-muted">
-            Academy · Programming path
+            Academy - Programming path
           </p>
           <h1 className="mt-1 text-lg sm:text-2xl font-semibold gaia-strong">
             Web Developer Track
           </h1>
           <p className="mt-1 text-xs sm:text-sm gaia-muted max-w-xl">
             From true beginner to building GAIA-style apps: HTML, CSS, JS,
-            React, Next.js, and Supabase — all paced for your energy and time.
+            React, Next.js, and Supabase - all paced for your energy and time.
           </p>
         </div>
 
@@ -233,7 +233,7 @@ export default function ProgrammingTrackPage() {
               Overall progress
             </span>
             <span className="gaia-strong text-sm">
-              {completedCount}/{totalProgrammingLessons} lessons ·{" "}
+              {completedCount}/{totalProgrammingLessons} lessons -{" "}
               {completionPercent}%
             </span>
           </div>
@@ -265,7 +265,7 @@ export default function ProgrammingTrackPage() {
                 Currently studying
               </p>
               <h2 className="text-base sm:text-lg font-semibold gaia-strong">
-                {activeLesson.code} · {activeLesson.title}
+                {activeLesson.code} - {activeLesson.title}
               </h2>
               <ProgrammingLessonContent
                 lessonCode={activeLesson.code}
@@ -356,7 +356,7 @@ export default function ProgrammingTrackPage() {
                           }`}
                           aria-hidden="true"
                         >
-                          {completed ? "✓" : locked ? "•" : ""}
+                          {completed ? "OK" : locked ? "*" : ""}
                         </span>
 
                         <span className="gaia-strong text-[11px] sm:text-xs w-10">

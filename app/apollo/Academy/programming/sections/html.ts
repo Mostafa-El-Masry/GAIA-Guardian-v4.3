@@ -13,8 +13,8 @@ export function getHtmlStudy(lessonCode: string): StudyDescription | null {
         paragraphs: [
           "HTML is the skeleton of every web page. Before you think about colors or animations, you need a clear structure: where is the title, where is the content, where is the navigation.",
           "In this lesson, you focus on the basic structure: <!DOCTYPE html>, <html>, <head>, and <body>. This is the frame that every modern page still uses, including GAIA.",
-          "You also see how headings (<h1>, <h2>, …), paragraphs (<p>), and simple lists (<ul>, <li>) help you express the logical order of your content.",
-          "The goal is not to write something beautiful yet. The goal is to write something that is clean, valid, and easy to read — for you and for GAIA.",
+          "You also see how headings (<h1>, <h2>, ...), paragraphs (<p>), and simple lists (<ul>, <li>) help you express the logical order of your content.",
+          "The goal is not to write something beautiful yet. The goal is to write something that is clean, valid, and easy to read - for you and for GAIA.",
         ],
       };
     case "2.2":
@@ -370,8 +370,8 @@ export function getHtmlPractice(lessonCode: string): PracticePrompt | null {
         description:
           "Now you will write a complete, simple HTML page by hand. Focus on structure and correctness, not on design.",
         instructions: [
-          "In the practice box below, write a full HTML document with <!DOCTYPE html>, <html>, <head>, and <body>. In <head>, include a <title> like \"GAIA · HTML Foundations\".",
-          "Inside <body>, create a main <h1> heading, at least two <h2> subheadings, some <p> paragraphs, and one unordered list (<ul>) with 3–5 items.",
+          "In the practice box below, write a full HTML document with <!DOCTYPE html>, <html>, <head>, and <body>. In <head>, include a <title> like \"GAIA - HTML Foundations\".",
+          "Inside <body>, create a main <h1> heading, at least two <h2> subheadings, some <p> paragraphs, and one unordered list (<ul>) with 3-5 items.",
           "When you are done, click \"Check practice & mark lesson\". GAIA will quickly check if the required tags exist before it marks the lesson completed.",
           "Project pattern: First, build this page completely alone. Later, you can ask AI to review your HTML and suggest improvements for readability and structure.",
         ],

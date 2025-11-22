@@ -9,6 +9,12 @@ import {
   PracticeCheckResult,
 } from "./lessonTypes";
 import {
+  getCapstonePractice,
+  getCapstoneQuiz,
+  getCapstoneStudy,
+  validateCapstonePractice,
+} from "./sections/capstone";
+import {
   getFoundationsStudy,
   getFoundationsQuiz,
   getFoundationsPractice,
@@ -32,6 +38,18 @@ import {
   getJsPractice,
   validateJsPractice,
 } from "./sections/javascript";
+import {
+  getReactNextPractice,
+  getReactNextQuiz,
+  getReactNextStudy,
+  validateReactNextPractice,
+} from "./sections/reactNext";
+import {
+  getSupabasePractice,
+  getSupabaseQuiz,
+  getSupabaseStudy,
+  validateSupabasePractice,
+} from "./sections/supabase";
 
 type TabId = "study" | "quiz" | "practice";
 
@@ -44,7 +62,15 @@ type ProgrammingLessonContentProps = {
 const MIN_PRACTICE_LENGTH = 250;
 
 function resolveStudy(lessonCode: string): StudyDescription {
-  const resolvers = [getFoundationsStudy, getHtmlStudy, getCssStudy, getJsStudy];
+  const resolvers = [
+    getFoundationsStudy,
+    getHtmlStudy,
+    getCssStudy,
+    getJsStudy,
+    getReactNextStudy,
+    getSupabaseStudy,
+    getCapstoneStudy,
+  ];
   for (const resolver of resolvers) {
     const result = resolver(lessonCode);
     if (result) return result;
@@ -59,7 +85,15 @@ function resolveStudy(lessonCode: string): StudyDescription {
 }
 
 function resolveQuiz(lessonCode: string): QuizConfig | null {
-  const resolvers = [getFoundationsQuiz, getHtmlQuiz, getCssQuiz, getJsQuiz];
+  const resolvers = [
+    getFoundationsQuiz,
+    getHtmlQuiz,
+    getCssQuiz,
+    getJsQuiz,
+    getReactNextQuiz,
+    getSupabaseQuiz,
+    getCapstoneQuiz,
+  ];
   for (const resolver of resolvers) {
     const result = resolver(lessonCode);
     if (result) return result;
@@ -68,7 +102,15 @@ function resolveQuiz(lessonCode: string): QuizConfig | null {
 }
 
 function resolvePractice(lessonCode: string): PracticePrompt {
-  const resolvers = [getFoundationsPractice, getHtmlPractice, getCssPractice, getJsPractice];
+  const resolvers = [
+    getFoundationsPractice,
+    getHtmlPractice,
+    getCssPractice,
+    getJsPractice,
+    getReactNextPractice,
+    getSupabasePractice,
+    getCapstonePractice,
+  ];
   for (const resolver of resolvers) {
     const result = resolver(lessonCode);
     if (result) return result;
@@ -93,6 +135,9 @@ function resolvePracticeValidation(
     validateHtmlPractice,
     validateCssPractice,
     validateJsPractice,
+    validateReactNextPractice,
+    validateSupabasePractice,
+    validateCapstonePractice,
   ];
   for (const resolver of resolvers) {
     const result = resolver(lessonCode, content);
@@ -211,9 +256,9 @@ const ProgrammingLessonContent = ({
                 : "bg-black/40 text-white border-white/20 hover:border-white/40"
             }`}
           >
-            {tab === "study" && "1 · Study"}
-            {tab === "quiz" && "2 · Quiz"}
-            {tab === "practice" && "3 · Practice"}
+            {tab === "study" && "1 - Study"}
+            {tab === "quiz" && "2 - Quiz"}
+            {tab === "practice" && "3 - Practice"}
           </button>
         ))}
       </div>
@@ -406,7 +451,7 @@ const ProgrammingLessonContent = ({
     <title>Practice</title>
   </head>
   <body>
-    <h1>Hello Sasa 👋</h1>
+    <h1>Hello Sasa!</h1>
     <p>This is your Academy practice playground.</p>
   </body>
 </html>`

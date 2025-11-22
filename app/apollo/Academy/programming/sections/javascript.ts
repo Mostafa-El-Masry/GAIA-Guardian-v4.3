@@ -33,7 +33,7 @@ export function getJsStudy(lessonCode: string): StudyDescription | null {
         paragraphs: [
           "Functions are named blocks of code that you can call many times. Instead of repeating the same logic, you put it into a function.",
           "You will learn how to define functions with parameters, return values, and how to choose clear names like calculateProgress or formatDate.",
-          "In GAIA, many small utilities — like computing completion percentage or mapping a mood value to a color — will be implemented as functions.",
+          "In GAIA, many small utilities - like computing completion percentage or mapping a mood value to a color - will be implemented as functions.",
           "The goal is to trust that you can break a problem into small functions instead of writing one huge, messy block.",
         ],
       };
@@ -41,9 +41,9 @@ export function getJsStudy(lessonCode: string): StudyDescription | null {
       return {
         title: "Arrays and Objects: Structuring Data for GAIA",
         paragraphs: [
-          "Arrays and objects are the containers you will use all the time. Arrays are ordered lists (like a list of lessons). Objects are key–value collections (like a single lesson with properties).",
+          "Arrays and objects are the containers you will use all the time. Arrays are ordered lists (like a list of lessons). Objects are key-value collections (like a single lesson with properties).",
           "You will practice creating arrays of numbers and strings, and objects with clear keys like title, estimateMinutes, and completed.",
-          "In GAIA, almost all data — lessons, daily notes, certificates, health logs — can be expressed as arrays of objects.",
+          "In GAIA, almost all data - lessons, daily notes, certificates, health logs - can be expressed as arrays of objects.",
           "The goal is to be comfortable reading and shaping this data so you can pass it into React components or send it to Supabase later.",
         ],
       };
@@ -55,6 +55,26 @@ export function getJsStudy(lessonCode: string): StudyDescription | null {
           "You will learn how to select elements with document.querySelector, update text content, and respond to simple events like button clicks.",
           "Even though GAIA uses React and Next.js, this DOM understanding will help you reason about what React is abstracting away for you.",
           "The goal is to see that JavaScript can take your static HTML and turn it into something interactive, one tiny step at a time.",
+        ],
+      };
+    case "4.6":
+      return {
+        title: "Events and User Interaction",
+        paragraphs: [
+          "Events are how JavaScript responds to the real world: clicks, input changes, key presses, form submissions, and more.",
+          "You attach listeners with addEventListener and receive an event object that tells you what happened and where.",
+          "Preventing default form submission or stopping propagation are common patterns to keep your UI predictable.",
+          "In GAIA-style apps, you will lean on events to update progress, toggle states, and connect user input to data.",
+        ],
+      };
+    case "4.7":
+      return {
+        title: "Fetch and APIs: Talking to Servers",
+        paragraphs: [
+          "fetch is a built-in browser API that lets you request data from servers, turning a URL into a Response you can read as JSON or text.",
+          "Most modern code wraps fetch in async/await for readability: const res = await fetch(...); const data = await res.json();",
+          "You should handle errors (non-200 status codes, network issues) and consider loading states so the UI does not feel frozen.",
+          "In GAIA, you will use fetch to talk to Supabase edge functions or APIs, so this lesson sets the foundation for connected data.",
         ],
       };
     default:
@@ -294,6 +314,98 @@ export function getJsQuiz(lessonCode: string): QuizConfig | null {
           },
         ],
       };
+    case "4.6":
+      return {
+        id: "quiz-4-6",
+        title: "Check your understanding of events",
+        questions: [
+          {
+            id: "q1",
+            prompt: "Which method attaches a click handler to a button element?",
+            options: [
+              { id: "q1-a", label: "button.listen('click', handler)" },
+              { id: "q1-b", label: "button.addEventListener('click', handler)" },
+              { id: "q1-c", label: "button.on('click', handler)" },
+              { id: "q1-d", label: "button.run(handler)" },
+            ],
+            correctOptionId: "q1-b",
+            explanation:
+              "addEventListener is the standard method to register event handlers in the browser.",
+          },
+          {
+            id: "q2",
+            prompt: "What does event.preventDefault() do in a submit handler?",
+            options: [
+              { id: "q2-a", label: "Stops the page from refreshing or navigating on submit" },
+              { id: "q2-b", label: "Deletes the form" },
+              { id: "q2-c", label: "Logs the event to the console" },
+              { id: "q2-d", label: "Automatically saves data to GAIA" },
+            ],
+            correctOptionId: "q2-a",
+            explanation:
+              "preventDefault stops the browser's default action (like navigating away), so you can handle the data with JavaScript.",
+          },
+          {
+            id: "q3",
+            prompt: "Where can you read details about what triggered an event?",
+            options: [
+              { id: "q3-a", label: "Only by guessing" },
+              { id: "q3-b", label: "Inside the event object passed to your handler" },
+              { id: "q3-c", label: "In a global eventHistory variable" },
+              { id: "q3-d", label: "You cannot access it" },
+            ],
+            correctOptionId: "q3-b",
+            explanation:
+              "The event argument contains properties like target, currentTarget, and key information depending on the event type.",
+          },
+        ],
+      };
+    case "4.7":
+      return {
+        id: "quiz-4-7",
+        title: "Check your understanding of fetch and APIs",
+        questions: [
+          {
+            id: "q1",
+            prompt: "What does await fetch('/api/data') return when the promise resolves?",
+            options: [
+              { id: "q1-a", label: "A parsed JSON object directly" },
+              { id: "q1-b", label: "A Response object you can read" },
+              { id: "q1-c", label: "An HTML string" },
+              { id: "q1-d", label: "Only a status code" },
+            ],
+            correctOptionId: "q1-b",
+            explanation:
+              "fetch returns a Response object. You then call res.json() or res.text() to read the body.",
+          },
+          {
+            id: "q2",
+            prompt: "Which pattern handles errors when using fetch with async/await?",
+            options: [
+              { id: "q2-a", label: "Ignore them; fetch never fails" },
+              { id: "q2-b", label: "Wrap the call in try/catch and check res.ok" },
+              { id: "q2-c", label: "Only use then() chains" },
+              { id: "q2-d", label: "Write errors to a file" },
+            ],
+            correctOptionId: "q2-b",
+            explanation:
+              "Network errors throw, and non-OK responses still resolve. You typically check res.ok and use try/catch around await fetch.",
+          },
+          {
+            id: "q3",
+            prompt: "What is a common reason to set headers on a fetch request?",
+            options: [
+              { id: "q3-a", label: "To change the browser theme" },
+              { id: "q3-b", label: "To tell the server what content type you are sending, like JSON" },
+              { id: "q3-c", label: "To make CSS load faster" },
+              { id: "q3-d", label: "Headers are never used" },
+            ],
+            correctOptionId: "q3-b",
+            explanation:
+              "Headers like Content-Type: application/json tell the server how to parse the request body and can include auth tokens.",
+          },
+        ],
+      };
     default:
       return null;
   }
@@ -328,7 +440,7 @@ export function getJsPractice(lessonCode: string): PracticePrompt | null {
       return {
         title: "Write a function to compute completion",
         description:
-          "You will write a small function that computes a completion percentage for lessons — exactly the kind of utility GAIA needs.",
+          "You will write a small function that computes a completion percentage for lessons - exactly the kind of utility GAIA needs.",
         instructions: [
           "Write a function called calculateCompletion that takes two parameters: completed and total.",
           "Inside, compute the percentage (completed / total * 100) and return a rounded value using Math.round.",
@@ -357,6 +469,28 @@ export function getJsPractice(lessonCode: string): PracticePrompt | null {
           "Make sure the text updates every time you click, for example: 'Sessions today: 1', 'Sessions today: 2', etc.",
           "Project pattern A (solo): First, try to write this JavaScript completely alone and debug it yourself if it does not work.",
           "Project pattern B (with AI): Later, you can ask AI to review your code and suggest improvements, like better variable names or small refactors.",
+        ],
+      };
+    case "4.6":
+      return {
+        title: "Handle events for a tiny form",
+        description:
+          "Practice wiring up event listeners so a form feels interactive instead of static.",
+        instructions: [
+          "Create variables that select a form element and an input (for example, document.querySelector('.note-form')).",
+          "Add a submit listener with addEventListener('submit', ...) that calls event.preventDefault().",
+          "Inside the handler, read the input value, log it, and clear the field. Optionally show a message that includes the submitted text.",
+        ],
+      };
+    case "4.7":
+      return {
+        title: "Fetch data and handle errors",
+        description:
+          "Write a small async function that fetches JSON, checks the response, and handles failures gracefully.",
+        instructions: [
+          "Write an async function called loadLessons that calls fetch with a URL like 'https://example.com/api/lessons'.",
+          "Await the response, check res.ok, and if true parse JSON with await res.json(); otherwise log an error with the status code.",
+          "Wrap the call in try/catch and set a friendly fallback (for example, const lessons = [] if something fails).",
         ],
       };
     default:
@@ -434,6 +568,34 @@ export function validateJsPractice(
         ok: false,
         message:
           "Your DOM mini project is missing some expected pieces (variables, addEventListener, and querySelector). Missing: " +
+          missing.join(", "),
+      };
+    }
+    return { ok: true };
+  }
+
+  if (lessonCode === "4.6") {
+    const required = ["addeventlistener", "preventdefault", "event"];
+    const missing = required.filter((snippet) => !src.includes(snippet));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message:
+          "Your events practice is missing some expected pieces (addEventListener, event, preventDefault). Missing: " +
+          missing.join(", "),
+      };
+    }
+    return { ok: true };
+  }
+
+  if (lessonCode === "4.7") {
+    const required = ["fetch", "async", "await", "res.ok"];
+    const missing = required.filter((snippet) => !src.includes(snippet));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message:
+          "Your fetch practice is missing some expected pieces (async/await, fetch, and an ok check). Missing: " +
           missing.join(", "),
       };
     }

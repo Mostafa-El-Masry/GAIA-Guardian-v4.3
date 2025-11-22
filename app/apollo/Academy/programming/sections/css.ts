@@ -14,7 +14,7 @@ export function getCssStudy(lessonCode: string): StudyDescription | null {
           "CSS is how you tell the browser what your HTML should look like: colors, spacing, fonts, and layout.",
           "You write rules that target elements using selectors (like h1, .class-name, #id) and then apply properties (like color, background, font-size).",
           "In this lesson, you focus on writing a few simple rules to style headings and paragraphs so they feel more like GAIA, not a default plain page.",
-          "Do not worry about layout yet — just get comfortable with the shape: selector { property: value; }.",
+          "Do not worry about layout yet - just get comfortable with the shape: selector { property: value; }.",
         ],
       };
     case "3.2":
@@ -33,6 +33,36 @@ export function getCssStudy(lessonCode: string): StudyDescription | null {
           "Flexbox is a layout system that makes it much easier to line items up in a row or column and control how they grow or shrink.",
           "You turn a container into a flex container with display: flex, then use properties like justify-content and align-items to control alignment.",
           "In this lesson, you will build a simple horizontal navigation bar using flexbox, similar to how GAIA might lay out small pill buttons or tabs.",
+        ],
+      };
+    case "3.4":
+      return {
+        title: "Responsive Design: Mobile-First Thinking",
+        paragraphs: [
+          "GAIA needs to feel good on both a phone and a laptop. Responsive design starts with a mobile-first base, then adds media queries for wider screens.",
+          "Fluid units like % and rem keep layouts flexible, while max-width keeps content from stretching too far on large monitors.",
+          "Media queries such as @media (min-width: 768px) let you change layouts (for example, turn a single column into two columns) when there is enough space.",
+          "In this lesson you practice writing a small layout that is readable on mobile and then expands gracefully on tablet/desktop.",
+        ],
+      };
+    case "3.5":
+      return {
+        title: "Tailwind Setup: Faster Styling in Projects",
+        paragraphs: [
+          "Tailwind is a utility-first CSS framework that speeds up styling by letting you compose classes instead of writing lots of custom CSS.",
+          "To set it up you install the npm packages, add @tailwind base; @tailwind components; @tailwind utilities; to your global CSS, and point the content paths in tailwind.config.{js,ts} to your src/app/components folders.",
+          "Tailwind works with PostCSS to generate only the classes you actually use, keeping bundles small even with many utilities available.",
+          "In this lesson you focus on wiring Tailwind into a Next.js app the same way GAIA is wired, so you can move quickly in later lessons.",
+        ],
+      };
+    case "3.6":
+      return {
+        title: "Tailwind Layouts and Reusable Pieces",
+        paragraphs: [
+          "Once Tailwind is running, you can assemble layouts with classes like flex, grid, gap-4, rounded-xl, and shadow to mirror GAIA panels and pills.",
+          "You can extract repeated class combinations into small React components or helper functions so you do not repeat long className strings everywhere.",
+          "Customization happens in tailwind.config where you can add colors, spacing scales, and fonts that match the GAIA look.",
+          "In this lesson you practice building a reusable card and header bar using Tailwind utilities, keeping the HTML semantic and the classes tidy.",
         ],
       };
     default:
@@ -110,10 +140,10 @@ export function getCssQuiz(lessonCode: string): QuizConfig | null {
             prompt:
               "Which option best describes the order from inside to outside of the box model?",
             options: [
-              { id: "q1-a", label: "Margin → Border → Padding → Content" },
-              { id: "q1-b", label: "Content → Padding → Border → Margin" },
-              { id: "q1-c", label: "Padding → Content → Border → Margin" },
-              { id: "q1-d", label: "Content → Border → Padding → Margin" },
+              { id: "q1-a", label: "Margin -> Border -> Padding -> Content" },
+              { id: "q1-b", label: "Content -> Padding -> Border -> Margin" },
+              { id: "q1-c", label: "Padding -> Content -> Border -> Margin" },
+              { id: "q1-d", label: "Content -> Border -> Padding -> Margin" },
             ],
             correctOptionId: "q1-b",
             explanation:
@@ -196,6 +226,144 @@ export function getCssQuiz(lessonCode: string): QuizConfig | null {
           },
         ],
       };
+    case "3.4":
+      return {
+        id: "quiz-3-4",
+        title: "Check your understanding of responsive design",
+        questions: [
+          {
+            id: "q1",
+            prompt: "What does mobile-first CSS usually mean?",
+            options: [
+              { id: "q1-a", label: "Writing desktop styles and shrinking them with max-width" },
+              { id: "q1-b", label: "Starting with narrow screens and layering on styles with min-width media queries" },
+              { id: "q1-c", label: "Using only absolute positioning" },
+              { id: "q1-d", label: "Ignoring tablet sizes" },
+            ],
+            correctOptionId: "q1-b",
+            explanation:
+              "You set base styles for small screens, then add @media (min-width: ...) rules as the screen gets wider.",
+          },
+          {
+            id: "q2",
+            prompt: "Which unit helps keep text sizing flexible across devices?",
+            options: [
+              { id: "q2-a", label: "px" },
+              { id: "q2-b", label: "rem" },
+              { id: "q2-c", label: "vh only" },
+              { id: "q2-d", label: "deg" },
+            ],
+            correctOptionId: "q2-b",
+            explanation:
+              "rem scales with the root font-size, so it adapts better than hard-coded px for many layouts.",
+          },
+          {
+            id: "q3",
+            prompt: "What does this media query target? @media (min-width: 1024px)",
+            options: [
+              { id: "q3-a", label: "Screens smaller than 1024px" },
+              { id: "q3-b", label: "Screens exactly 1024px wide" },
+              { id: "q3-c", label: "Screens 1024px wide or wider" },
+              { id: "q3-d", label: "Only print layouts" },
+            ],
+            correctOptionId: "q3-c",
+            explanation:
+              "min-width triggers at that width and above, so you can enhance layouts for desktop sizes.",
+          },
+        ],
+      };
+    case "3.5":
+      return {
+        id: "quiz-3-5",
+        title: "Check your understanding of Tailwind setup",
+        questions: [
+          {
+            id: "q1",
+            prompt: "Which file needs the @tailwind base/components/utilities directives?",
+            options: [
+              { id: "q1-a", label: "tailwind.config.ts" },
+              { id: "q1-b", label: "A global CSS file (for example globals.css)" },
+              { id: "q1-c", label: "package.json" },
+              { id: "q1-d", label: "next.config.js" },
+            ],
+            correctOptionId: "q1-b",
+            explanation:
+              "You import Tailwind layers in your global stylesheet so the framework can generate utilities.",
+          },
+          {
+            id: "q2",
+            prompt: "Why do you list paths like ./app/**/*.{ts,tsx} in tailwind.config content?",
+            options: [
+              { id: "q2-a", label: "To lint TypeScript files" },
+              { id: "q2-b", label: "To tell Tailwind where to scan for class names to keep in the final CSS" },
+              { id: "q2-c", label: "To configure routing" },
+              { id: "q2-d", label: "To install React" },
+            ],
+            correctOptionId: "q2-b",
+            explanation:
+              "Tailwind purges unused styles; it needs to scan your source files to know which classes to include.",
+          },
+          {
+            id: "q3",
+            prompt: "Which command typically starts a dev server with Tailwind in a Next.js project?",
+            options: [
+              { id: "q3-a", label: "npm run build" },
+              { id: "q3-b", label: "npm run lint" },
+              { id: "q3-c", label: "npm run dev" },
+              { id: "q3-d", label: "npx tailwind-only" },
+            ],
+            correctOptionId: "q3-c",
+            explanation:
+              "npm run dev (or pnpm dev) runs Next.js with Tailwind processing your CSS in watch mode.",
+          },
+        ],
+      };
+    case "3.6":
+      return {
+        id: "quiz-3-6",
+        title: "Check your understanding of Tailwind layouts",
+        questions: [
+          {
+            id: "q1",
+            prompt: "What does className=\"flex gap-4 items-center\" do to a container?",
+            options: [
+              { id: "q1-a", label: "Stacks items vertically with no spacing" },
+              { id: "q1-b", label: "Lays out children in a row with 1rem-ish gaps and centers them vertically" },
+              { id: "q1-c", label: "Adds padding to children" },
+              { id: "q1-d", label: "Creates a CSS grid" },
+            ],
+            correctOptionId: "q1-b",
+            explanation:
+              "flex creates a row by default, gap-4 adds space, and items-center aligns on the cross axis.",
+          },
+          {
+            id: "q2",
+            prompt: "Where do you add custom colors or spacing scales for Tailwind?",
+            options: [
+              { id: "q2-a", label: "package-lock.json" },
+              { id: "q2-b", label: "tailwind.config.ts/js theme.extend section" },
+              { id: "q2-c", label: "next-env.d.ts" },
+              { id: "q2-d", label: "Only in CSS variables" },
+            ],
+            correctOptionId: "q2-b",
+            explanation:
+              "theme.extend inside tailwind.config is where you add project-specific tokens like colors and spacing.",
+          },
+          {
+            id: "q3",
+            prompt: "How can you avoid repeating long Tailwind class lists across components?",
+            options: [
+              { id: "q3-a", label: "Do not repeat; Tailwind forces duplication" },
+              { id: "q3-b", label: "Extract small components or helper functions that encapsulate the className" },
+              { id: "q3-c", label: "Inline styles only" },
+              { id: "q3-d", label: "Use !important everywhere" },
+            ],
+            correctOptionId: "q3-b",
+            explanation:
+              "Wrapping common class combinations in components or helper functions keeps your JSX clean and consistent.",
+          },
+        ],
+      };
     default:
       return null;
   }
@@ -236,6 +404,39 @@ export function getCssPractice(lessonCode: string): PracticePrompt | null {
           "Give the bar a background color and some padding so it feels like a real part of an app header.",
           "Project pattern A (solo): First, try to style this nav bar without asking AI. Only use docs if you forget a property name.",
           "Project pattern B (with AI): Later, you can ask AI to help you refactor this CSS into Tailwind utility classes or improve the design details.",
+        ],
+      };
+    case "3.4":
+      return {
+        title: "Make a layout responsive with a media query",
+        description:
+          "Practice turning a single-column layout into a two-column layout on wider screens, keeping a readable mobile base.",
+        instructions: [
+          "Write base CSS for a .page container that uses a single column with max-width and padding for mobile.",
+          "Add a media query like @media (min-width: 768px) that switches a child .grid into two columns using display: grid or flex.",
+          "Make sure text stays readable by using rem for font sizes or spacing instead of only px.",
+        ],
+      };
+    case "3.5":
+      return {
+        title: "Wire Tailwind into a tiny Next.js snippet",
+        description:
+          "Pretend you are adding Tailwind to a Next.js project like GAIA. Show the key pieces in code.",
+        instructions: [
+          "In the practice box, include the three Tailwind directives (@tailwind base; @tailwind components; @tailwind utilities;) as they would appear in a globals.css file.",
+          "Write a short tailwind.config content array that includes ./app/**/*.{ts,tsx} so Tailwind scans the app router files.",
+          "Add a tiny JSX snippet that uses Tailwind classes (for example, className=\"rounded-xl bg-slate-900 px-4 py-3 text-white\").",
+        ],
+      };
+    case "3.6":
+      return {
+        title: "Build a reusable Tailwind card layout",
+        description:
+          "Use Tailwind utilities to style a card and a header bar the way GAIA panels look.",
+        instructions: [
+          "Create a container with class names like flex or grid plus gap-4 to align at least two cards.",
+          "Style each card with padding, rounded corners, a subtle background, and maybe shadow or border to separate it from the background.",
+          "Include a small header bar at the top that uses flex, gap, and text sizing classes to align a title and an action button.",
         ],
       };
     default:
@@ -285,6 +486,48 @@ export function validateCssPractice(
         ok: false,
         message:
           "Your flexbox navigation is missing some key pieces (display: flex and alignment). Missing: " +
+          missing.join(", "),
+      };
+    }
+    return { ok: true };
+  }
+
+  if (lessonCode === "3.4") {
+    const required = ["@media", "min-width", "max-width"];
+    const missing = required.filter((snippet) => !src.includes(snippet));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message:
+          "Your responsive layout is missing some expected responsive pieces (media query and width constraints). Missing: " +
+          missing.join(", "),
+      };
+    }
+    return { ok: true };
+  }
+
+  if (lessonCode === "3.5") {
+    const required = ["@tailwind base", "@tailwind components", "@tailwind utilities", "content:"];
+    const missing = required.filter((snippet) => !src.includes(snippet));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message:
+          "Your Tailwind setup snippet is missing some required items (directives and content paths). Missing: " +
+          missing.join(", "),
+      };
+    }
+    return { ok: true };
+  }
+
+  if (lessonCode === "3.6") {
+    const required = ["flex", "gap-", "rounded", "bg-"];
+    const missing = required.filter((snippet) => !src.includes(snippet));
+    if (missing.length > 0) {
+      return {
+        ok: false,
+        message:
+          "Your Tailwind card layout is missing some of the expected utility classes (flex/grid, gap, rounded, background). Missing: " +
           missing.join(", "),
       };
     }

@@ -13,7 +13,7 @@ export function getFoundationsStudy(lessonCode: string): StudyDescription | null
         paragraphs: [
           "In this first lesson, you are not expected to code yet. The goal is to see the whole map before we walk the road.",
           "When you type a URL in your browser, you are acting as a client. The browser sends a request over the internet to a server. That server finds the right data (a page, JSON, etc.), and sends a response back. Your browser then takes that response and renders it into something you can see and interact with.",
-          "For GAIA, this matters because everything you will build — from a tiny HTML page to a full Next.js plus Supabase app — is built on top of this simple idea: clients send requests, servers send responses.",
+          "For GAIA, this matters because everything you will build - from a tiny HTML page to a full Next.js plus Supabase app - is built on top of this simple idea: clients send requests, servers send responses.",
           "The goal here is not to memorize every technical word. It is to feel that the web is a conversation between you (the client) and a server somewhere else.",
         ],
       };
@@ -33,9 +33,9 @@ export function getFoundationsStudy(lessonCode: string): StudyDescription | null
         title: "How to Learn Programming Without Burning Out",
         paragraphs: [
           "This lesson is about your energy and your relationship with learning. You are not a robot. You are Sasa, with a job, family, and a life that is already full.",
-          "Instead of trying to be perfect, you will use short, honest sessions — like 30, 45, or 60 minutes — and then stop. The goal is to come back again tomorrow, not to destroy yourself in one heroic night.",
+          "Instead of trying to be perfect, you will use short, honest sessions - like 30, 45, or 60 minutes - and then stop. The goal is to come back again tomorrow, not to destroy yourself in one heroic night.",
           "You will also learn to separate study time from output time. Study time is for understanding and following along. Output time is for building small things, like GAIA modules, with the knowledge you collected.",
-          "Feeling stuck, tired, or emotional does not mean you are bad. It means you are human. The skill we are building is to pause, breathe, adjust the plan, and then continue — slowly but stubbornly.",
+          "Feeling stuck, tired, or emotional does not mean you are bad. It means you are human. The skill we are building is to pause, breathe, adjust the plan, and then continue - slowly but stubbornly.",
           "This mindset is what will carry you from the first HTML tag all the way to connected GAIA apps and, later, your accounting center.",
         ],
       };
@@ -261,7 +261,7 @@ export function getFoundationsQuiz(lessonCode: string): QuizConfig | null {
           {
             id: "q1",
             prompt:
-              "What is the main idea of working in short, focused sessions (like 30–60 minutes)?",
+              "What is the main idea of working in short, focused sessions (like 30-60 minutes)?",
             options: [
               {
                 id: "q1-a",
@@ -358,7 +358,7 @@ export function getFoundationsPractice(lessonCode: string): PracticePrompt | nul
         description:
           "Here we want to check that you can explain in your own words what is happening when you load a page. This is not about perfect English. It is about you understanding the flow.",
         instructions: [
-          "In the box below, write a short explanation (at least 5–6 lines) of what happens when you type a URL in the browser and press Enter.",
+          "In the box below, write a short explanation (at least 5-6 lines) of what happens when you type a URL in the browser and press Enter.",
           "Mention: the browser, the server, the request, the response, and HTML/CSS/JS.",
           "Imagine you are explaining this to a future version of yourself who forgot everything.",
           "Project pattern: First, write it fully by yourself. Later, you can ask AI to help you re-write it more clearly and compare the two versions.",
@@ -371,8 +371,8 @@ export function getFoundationsPractice(lessonCode: string): PracticePrompt | nul
           "We want you to be clear about what tools you will use and how you will open them, so there is less friction next time you sit to study.",
         instructions: [
           "In the box below, write which editor you will use (for example VS Code) and where your GAIA projects will live on your machine (for example C:\\gaia or /home/sasa/gaia).",
-          "Write 3–5 sentences describing what Git will do for you and why you will use it, even if you are the only person working on GAIA.",
-          "Write 2–3 sentences about the terminal: which commands you expect to run often (npm run dev, git status, etc.).",
+          "Write 3-5 sentences describing what Git will do for you and why you will use it, even if you are the only person working on GAIA.",
+          "Write 2-3 sentences about the terminal: which commands you expect to run often (npm run dev, git status, etc.).",
           "Project pattern: Do this first alone. Later, you can ask AI to suggest improvements to your workflow and folder structure and compare ideas.",
         ],
       };
@@ -384,8 +384,8 @@ export function getFoundationsPractice(lessonCode: string): PracticePrompt | nul
         instructions: [
           "Write down your ideal weekly rhythm: for example, three days programming (30 / 45 / 60 minutes) and three days accounting, plus Friday for self-repair.",
           "Write, honestly, what usually breaks this rhythm for you (tiredness, mood, family, work). Do not judge yourself; just describe.",
-          "Finally, write 3 small rules you promise to follow when you feel low (for example: I will still open GAIA, I will do 10–15 minutes, and then I am allowed to rest with no guilt).",
-          "Project pattern A (solo): Save this as your personal contract and follow it for at least 2–3 weeks without asking AI to change it.",
+          "Finally, write 3 small rules you promise to follow when you feel low (for example: I will still open GAIA, I will do 10-15 minutes, and then I am allowed to rest with no guilt).",
+          "Project pattern A (solo): Save this as your personal contract and follow it for at least 2-3 weeks without asking AI to change it.",
           "Project pattern B (with AI): After you test it alone, you can come back later and ask AI to help you optimize or adjust this rhythm based on what actually happened.",
         ],
       };

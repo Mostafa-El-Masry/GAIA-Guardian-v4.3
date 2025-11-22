@@ -102,15 +102,16 @@ const UsersSettingsClient: React.FC = () => {
       try {
         const res = await fetch('/api/users');
         const data = (await res.json()) as UsersApiListResponse;
-        if (!data.ok || !data.users) {
+        if (!data.ok) {
           throw new Error(data.error || 'Failed to load users.');
         }
-        setUsers(data.users);
-        saveUsersToLocal(data.users);
+        const fetchedUsers = data.users ?? [];
+        setUsers(fetchedUsers);
+        saveUsersToLocal(fetchedUsers);
         setCurrentUserId((prev) => {
           if (prev) return prev;
-          const owner = data.users.find((u) => u.role === 'owner');
-          const first = owner ?? data.users[0];
+          const owner = fetchedUsers.find((u) => u.role === 'owner');
+          const first = owner ?? fetchedUsers[0];
           const id = first ? first.id : null;
           if (id) setCurrentUserIdLocal(id);
           return id;

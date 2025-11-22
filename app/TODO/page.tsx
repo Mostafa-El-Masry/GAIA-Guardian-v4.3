@@ -1,4 +1,4 @@
-// app/TODO/page.tsx
+﻿// app/TODO/page.tsx
 "use client";
 
 import { useMemo, useState, useCallback, useEffect } from "react";
@@ -9,9 +9,11 @@ import {
   waitForUserStorage,
   subscribe,
 } from "@/lib/user-storage";
+import { shiftDate } from "@/utils/dates";
 
 type StatusTone = "pending" | "done" | "skipped";
 type StatusResolution = { label: string; tone: StatusTone; dateLabel: string };
+type DragState = { id: string; category: Category } | null;
 
 const LABELS: Record<Category, string> = {
   life: "Life",
@@ -47,10 +49,26 @@ function formatShortDate(value?: string | null) {
   }
 }
 
+function compareDueDate(a?: string | null, b?: string | null) {
+  if (!a && !b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  return a.localeCompare(b);
+}
+
 export default function TODOPage() {
-  const { tasks, deleteTask, addQuickTask, editTask, setTaskStatus } = useTodoDaily();
+  const {
+    tasks,
+    today,
+    deleteTask,
+    addQuickTask,
+    editTask,
+    setTaskStatus,
+  } = useTodoDaily();
   const [storageStatus, setStorageStatus] = useState({ synced: false, hasTasks: false });
   const [drafts, setDrafts] = useState<Record<Category, string>>(EMPTY_DRAFTS);
+  const [dragging, setDragging] = useState<DragState>(null);
+  const [dragOver, setDragOver] = useState<DragState>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -86,6 +104,16 @@ export default function TODOPage() {
     for (const t of tasks) map[t.category].push(t);
     return map;
   }, [tasks]);
+
+  const orderedByCat = useMemo(() => {
+    const map: Record<Category, Task[]> = { life: [], work: [], distraction: [] };
+    (Object.keys(byCat) as Category[]).forEach((cat) => {
+      map[cat] = byCat[cat]
+        .slice()
+        .sort((a, b) => compareDueDate(a.due_date, b.due_date) || a.created_at.localeCompare(b.created_at));
+    });
+    return map;
+  }, [byCat]);
 
   const resolveStatus = useCallback((task: Task): StatusResolution => {
     const entries = Object.entries(task.status_by_date ?? {});
@@ -142,11 +170,56 @@ export default function TODOPage() {
     [setTaskStatus]
   );
 
+  const resequenceCategory = useCallback(
+    async (category: Category, orderedTasks: Task[]) => {
+      if (orderedTasks.length === 0) return;
+      const firstDate = orderedTasks.find((t) => t.due_date)?.due_date || shiftDate(today, 1);
+      const updates: Promise<unknown>[] = [];
+      orderedTasks.forEach((task, idx) => {
+        const nextDate = shiftDate(firstDate, idx);
+        if (task.due_date !== nextDate) {
+          updates.push(editTask(task.id, { due_date: nextDate }));
+        }
+      });
+      await Promise.all(updates);
+    },
+    [editTask, today]
+  );
+
+  const handleDrop = useCallback(
+    async (category: Category, targetId: string | null) => {
+      if (!dragging || dragging.category !== category) {
+        setDragging(null);
+        setDragOver(null);
+        return;
+      }
+      const list = orderedByCat[category];
+      const currentIdx = list.findIndex((t) => t.id === dragging.id);
+      if (currentIdx === -1) return;
+      const next = list.slice();
+      const [item] = next.splice(currentIdx, 1);
+      const targetIdx = targetId ? next.findIndex((t) => t.id === targetId) : next.length;
+      const insertAt = targetIdx === -1 ? next.length : targetIdx;
+      next.splice(insertAt, 0, item);
+      await resequenceCategory(category, next);
+      setDragging(null);
+      setDragOver(null);
+    },
+    [dragging, orderedByCat, resequenceCategory]
+  );
+
+  const dragIndicator = (taskId: string, category: Category) => {
+    if (!dragging || dragging.category !== category) return "";
+    if (dragging.id === taskId) return "ring-2 ring-primary/70";
+    if (dragOver?.id === taskId) return "border-primary/60 bg-primary/5";
+    return "";
+  };
+
   return (
-    <main className="mx-auto max-w-4xl p-4">
-      <header className="mb-6 space-y-2">
+    <main className="mx-auto max-w-5xl p-4">
+      <header className="mb-8 space-y-3 rounded-2xl border border-base-300 bg-gradient-to-r from-base-100 via-base-50 to-base-100 p-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold">TODO {"\u2014"} All Tasks</h1>
+          <h1 className="text-3xl font-bold tracking-tight">TODO {"\u2014"} All Tasks</h1>
           <span className="inline-flex items-center gap-2 rounded-full border border-base-300/70 px-3 py-1 text-xs text-base-content/70">
             <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: storageStatus.synced ? "var(--gaia-positive)" : "var(--gaia-warning)" }} />
             {storageStatus.synced ? "Backed up to Supabase" : "Local only"}
@@ -155,129 +228,167 @@ export default function TODOPage() {
             Local cache {storageStatus.hasTasks ? "present" : "empty"}
           </span>
         </div>
-        <p className="max-w-2xl text-sm text-base-content/70">
-          This is the full list backing the dashboard&apos;s &quot;Today&apos;s Focus&quot; panel. Tasks are grouped by Life, Work, and Distraction so you can see everything in one place.
+        <p className="max-w-3xl text-sm text-base-content/70">
+          Drag to reorder tasks inside each category. The order controls the scheduled date for that category, keeping one task per day. Drop at a new position to push its due date forward/backward automatically.
         </p>
       </header>
 
-      {CATEGORY_ORDER.map((cat) => (
-        <section key={cat} className="mb-8">
-          <header className="mb-2 flex items-baseline justify-between">
-            <h2 className="text-lg font-semibold">{LABELS[cat]}</h2>
-            <p className="text-xs text-base-content/60">{HINTS[cat]}</p>
-          </header>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {CATEGORY_ORDER.map((cat) => (
+          <section
+            key={cat}
+            className="flex h-full flex-col overflow-hidden rounded-2xl border border-base-300 bg-base-100/60 shadow-sm"
+          >
+            <div className="space-y-1 border-b border-base-300 bg-base-50/80 px-4 py-3">
+              <h2 className="text-lg font-semibold tracking-tight">{LABELS[cat]}</h2>
+              <p className="text-xs text-base-content/60">{HINTS[cat]}</p>
+            </div>
 
-          <div className="rounded-xl border border-base-300 bg-base-100/60">
-                {byCat[cat].length === 0 ? (
-                  <div className="space-y-1 p-4 text-sm text-base-content/60">
-                    <p>No tasks in this category yet.</p>
-                    <p>
-                  Add one below or from the dashboard&apos;s &quot;Today&apos;s Focus&quot; cards using Quick Add, and
-                  they&apos;ll sync here automatically.
-                </p>
-              </div>
-            ) : (
-              <ul className="divide-y divide-base-300">
-                {byCat[cat].map((t) => {
-                  const statusMeta = resolveStatus(t);
-                  const statusDate =
-                    (statusMeta.dateLabel !== "Unscheduled" && statusMeta.dateLabel) ||
-                    t.due_date ||
-                    null;
-                  const friendlyDue = formatShortDate(t.due_date);
+            <div className="flex flex-1 flex-col">
+              {orderedByCat[cat].length === 0 ? (
+                <div className="space-y-1 p-5 text-sm text-base-content/60">
+                  <p>No tasks in this category yet.</p>
+                  <p>
+                    Add one below or from the dashboard&apos;s &quot;Today&apos;s Focus&quot; cards using Quick Add, and they&apos;ll sync here automatically.
+                  </p>
+                </div>
+              ) : (
+                <ul
+                  className="divide-y divide-base-300"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    const lastId = orderedByCat[cat][orderedByCat[cat].length - 1]?.id;
+                    setDragOver(dragging && lastId ? { id: lastId, category: cat } : null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    void handleDrop(cat, null);
+                  }}
+                >
+                  {orderedByCat[cat].map((t) => {
+                    const statusMeta = resolveStatus(t);
+                    const statusDate =
+                      (statusMeta.dateLabel !== "Unscheduled" && statusMeta.dateLabel) ||
+                      t.due_date ||
+                      null;
+                    const friendlyDue = formatShortDate(t.due_date);
 
-                  return (
-                    <li key={t.id} className="p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="font-medium">{t.title}</div>
-                          {t.note && (
-                            <p className="text-sm text-base-content/70">{t.note}</p>
-                          )}
-                          {t.repeat && t.repeat !== "none" && (
-                            <p className="mt-1 text-xs uppercase tracking-wide text-base-content/60">
-                              Repeats: {String(t.repeat)}
+                    return (
+                      <li
+                        key={t.id}
+                        className={`p-3 transition ${dragIndicator(t.id, cat)}`}
+                        draggable
+                        onDragStart={() => setDragging({ id: t.id, category: cat })}
+                        onDragEnter={() => setDragOver({ id: t.id, category: cat })}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setDragOver({ id: t.id, category: cat });
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          void handleDrop(cat, t.id);
+                        }}
+                        onDragEnd={() => {
+                          setDragging(null);
+                          setDragOver(null);
+                        }}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-base-200 text-[10px] uppercase text-base-content/70 shadow-inner">
+                                :::
+                              </span>
+                              <div className="font-medium">{t.title}</div>
+                            </div>
+                            {t.note && (
+                              <p className="text-sm text-base-content/70">{t.note}</p>
+                            )}
+                            {t.repeat && t.repeat !== "none" && (
+                              <p className="mt-1 text-[11px] uppercase tracking-wide text-base-content/60">
+                                Repeats: {String(t.repeat)}
+                              </p>
+                            )}
+
+                            <StatusRow task={t} toneStyles={toneStyles} status={statusMeta} />
+                            <p className="mt-1 text-xs text-base-content/60">
+                              Due: {friendlyDue}
                             </p>
-                          )}
 
-                          <StatusRow task={t} toneStyles={toneStyles} status={statusMeta} />
-                          <p className="mt-1 text-xs text-base-content/60">
-                            Due: {friendlyDue}
-                          </p>
-
-                          <div className="mt-3 flex flex-wrap gap-3 text-xs text-base-content/70">
-                            <label className="flex items-center gap-2 rounded-lg border border-base-300 bg-base-50 px-3 py-2 text-xs font-medium">
-                              <span>Due date</span>
-                              <input
-                                type="date"
-                                className="rounded border border-base-200 bg-base-100 px-2 py-1 text-base-content"
-                                value={t.due_date ?? ""}
-                                onChange={(e) => handleDateChange(t.id, e.target.value)}
-                              />
-                            </label>
-                            <label className="flex items-center gap-2 rounded-lg border border-base-300 bg-base-50 px-3 py-2 text-xs font-medium">
-                              <span>Status</span>
-                              <select
-                                className="rounded border border-base-200 bg-base-100 px-2 py-1 text-base-content"
-                                value={statusMeta.tone}
-                                disabled={!statusDate}
-                                onChange={(e) =>
-                                  handleStatusChange(t, statusDate, e.target.value as StatusTone)
-                                }
-                              >
-                                <option value="pending">Pending</option>
-                                <option value="done">Done</option>
-                                <option value="skipped">Skipped</option>
-                              </select>
-                            </label>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-base-content/70">
+                              <label className="flex items-center gap-2 rounded-lg border border-base-300 bg-base-50 px-3 py-2 text-xs font-medium">
+                                <span>Due date</span>
+                                <input
+                                  type="date"
+                                  className="rounded border border-base-200 bg-base-100 px-2 py-1 text-base-content"
+                                  value={t.due_date ?? ""}
+                                  onChange={(e) => handleDateChange(t.id, e.target.value)}
+                                />
+                              </label>
+                              <label className="flex items-center gap-2 rounded-lg border border-base-300 bg-base-50 px-3 py-2 text-xs font-medium">
+                                <span>Status</span>
+                                <select
+                                  className="rounded border border-base-200 bg-base-100 px-2 py-1 text-base-content"
+                                  value={statusMeta.tone}
+                                  disabled={!statusDate}
+                                  onChange={(e) =>
+                                    handleStatusChange(t, statusDate, e.target.value as StatusTone)
+                                  }
+                                >
+                                  <option value="pending">Pending</option>
+                                  <option value="done">Done</option>
+                                  <option value="skipped">Skipped</option>
+                                </select>
+                              </label>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className="rounded-lg border border-base-300 px-2 py-1 text-xs text-base-content/70 hover:bg-base-200"
+                              onClick={() => deleteTask(t.id)}
+                              title="Delete task"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            className="rounded-lg border border-base-300 px-2 py-1 text-xs text-base-content/70 hover:bg-base-200"
-                            onClick={() => deleteTask(t.id)}
-                            title="Delete task"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
 
-            <form
-              className="flex flex-wrap items-center gap-2 border-t border-base-300 bg-base-50/70 p-3 text-sm"
-              onSubmit={(e) => {
-                e.preventDefault();
-                void handleAdd(cat);
-              }}
-            >
-              <label className="sr-only" htmlFor={`todo-add-${cat}`}>
-                Add {LABELS[cat]} task
-              </label>
-              <input
-                id={`todo-add-${cat}`}
-                className="flex-1 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm text-base-content placeholder:text-base-content/40"
-                placeholder={`Add a ${LABELS[cat]} task...`}
-                value={drafts[cat]}
-                onChange={(e) =>
-                  setDrafts((prev) => ({ ...prev, [cat]: e.target.value }))
-                }
-              />
-              <button
-                type="submit"
-                className="rounded-lg bg-base-content px-4 py-2 text-sm font-semibold text-base-100 transition hover:opacity-90 disabled:opacity-40"
-                disabled={!drafts[cat].trim()}
+              <form
+                className="flex flex-wrap items-center gap-2 border-t border-base-300 bg-base-50/70 p-3 text-sm"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void handleAdd(cat);
+                }}
               >
-                Add
-              </button>
-            </form>
-          </div>
-        </section>
-      ))}
+                <label className="sr-only" htmlFor={`todo-add-${cat}`}>
+                  Add {LABELS[cat]} task
+                </label>
+                <input
+                  id={`todo-add-${cat}`}
+                  className="flex-1 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-sm text-base-content placeholder:text-base-content/40"
+                  placeholder={`Add a ${LABELS[cat]} task...`}
+                  value={drafts[cat]}
+                  onChange={(e) =>
+                    setDrafts((prev) => ({ ...prev, [cat]: e.target.value }))
+                  }
+                />
+                <button
+                  type="submit"
+                  className="rounded-lg bg-base-content px-4 py-2 text-sm font-semibold text-base-100 transition hover:opacity-90 disabled:opacity-40"
+                  disabled={!drafts[cat].trim()}
+                >
+                  Add
+                </button>
+              </form>
+            </div>
+          </section>
+        ))}
+      </div>
     </main>
   );
 }

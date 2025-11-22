@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
@@ -10,28 +10,37 @@ type Mode = 'signin' | 'signup';
 
 interface LoginClientProps {
   className?: string;
+  initialMode?: Mode;
 }
 
 // GAIA Level 3 – Multi-user & Permissions
-// Version 4.3 · Week 2
+// Version 4.3 · Auth Fix
 //
 // LoginClient
 // -----------
 // Combined Sign-in / Create-account / Guest entry UI.
 // - "Create one" switches to signup mode on the same page.
-// - Signup uses Supabase email+password signUp (with name stored in metadata).
-// - "Continue as guest" creates a GAIA internal user with role "guest"
-//   via /api/users, with all permissions = false, and marks it as
-//   the active user in localStorage.
+// - "Sign in" switches back.
+// - initialMode is controlled by the /login route via searchParams.mode
+//   so links like /login?mode=signup open directly on the create form.
 //
-// NOTE: This only wires the front-end + basic Supabase calls.
-// Email confirmation / verification behaviour depends on your
-// Supabase auth settings (usually it sends a confirmation link).
+// Signup uses Supabase email+password signUp (with name in metadata).
+// "Continue as guest" creates a GAIA internal user with role "guest"
+// via /api/users, with all permissions = false, and marks it as
+// the active user in localStorage.
 
-const LoginClient: React.FC<LoginClientProps> = ({ className = '' }) => {
+const LoginClient: React.FC<LoginClientProps> = ({
+  className = '',
+  initialMode = 'signin',
+}) => {
   const router = useRouter();
   const supabase = createClientComponentClient();
-  const [mode, setMode] = useState<Mode>('signin');
+  const [mode, setMode] = useState<Mode>(initialMode);
+
+  // If searchParams.mode changes (via the page wrapper), keep in sync.
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -108,8 +117,7 @@ const LoginClient: React.FC<LoginClientProps> = ({ className = '' }) => {
         throw signUpError;
       }
 
-      // Optional: you can also create a GAIA internal user via /api/users here
-      // once you know the signup succeeded.
+      // Keep GAIA internal users table in sync (best-effort).
       try {
         await fetch('/api/users', {
           method: 'POST',
@@ -127,7 +135,7 @@ const LoginClient: React.FC<LoginClientProps> = ({ className = '' }) => {
           }),
         });
       } catch {
-        // ignore; this is just to keep GAIA's internal users table in sync
+        // ignore
       }
 
       if (data?.user?.id) {
@@ -139,6 +147,7 @@ const LoginClient: React.FC<LoginClientProps> = ({ className = '' }) => {
           'Sign-up request sent. If email confirmation is enabled, you should receive an email shortly.'
         );
       }
+      // After creating account, go back to sign-in mode.
       setMode('signin');
     } catch (err: any) {
       setError(err?.message ?? 'Failed to create account.');
@@ -181,7 +190,6 @@ const LoginClient: React.FC<LoginClientProps> = ({ className = '' }) => {
         // ignore
       }
 
-      // Guest can see only intro page (according to permissions / gating)
       router.push('/');
     } catch (err: any) {
       setError(err?.message ?? 'Failed to continue as guest.');

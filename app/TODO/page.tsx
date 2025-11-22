@@ -14,6 +14,7 @@ import { shiftDate } from "@/utils/dates";
 type StatusTone = "pending" | "done" | "skipped";
 type StatusResolution = { label: string; tone: StatusTone; dateLabel: string };
 type DragState = { id: string; category: Category } | null;
+type DropTarget = { category: Category; id: string | null; position: "before" | "after" } | null;
 
 const LABELS: Record<Category, string> = {
   life: "Life",
@@ -68,7 +69,7 @@ export default function TODOPage() {
   const [storageStatus, setStorageStatus] = useState({ synced: false, hasTasks: false });
   const [drafts, setDrafts] = useState<Record<Category, string>>(EMPTY_DRAFTS);
   const [dragging, setDragging] = useState<DragState>(null);
-  const [dragOver, setDragOver] = useState<DragState>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -187,23 +188,31 @@ export default function TODOPage() {
   );
 
   const handleDrop = useCallback(
-    async (category: Category, targetId: string | null) => {
+    async (category: Category, targetId: string | null, position: "before" | "after") => {
       if (!dragging || dragging.category !== category) {
         setDragging(null);
-        setDragOver(null);
+        setDropTarget(null);
         return;
       }
       const list = orderedByCat[category];
       const currentIdx = list.findIndex((t) => t.id === dragging.id);
       if (currentIdx === -1) return;
+
       const next = list.slice();
       const [item] = next.splice(currentIdx, 1);
-      const targetIdx = targetId ? next.findIndex((t) => t.id === targetId) : next.length;
-      const insertAt = targetIdx === -1 ? next.length : targetIdx;
+
+      let insertAt = next.length;
+      if (targetId) {
+        const targetIdx = next.findIndex((t) => t.id === targetId);
+        if (targetIdx !== -1) {
+          insertAt = position === "after" ? targetIdx + 1 : targetIdx;
+        }
+      }
+
       next.splice(insertAt, 0, item);
       await resequenceCategory(category, next);
       setDragging(null);
-      setDragOver(null);
+      setDropTarget(null);
     },
     [dragging, orderedByCat, resequenceCategory]
   );
@@ -211,7 +220,11 @@ export default function TODOPage() {
   const dragIndicator = (taskId: string, category: Category) => {
     if (!dragging || dragging.category !== category) return "";
     if (dragging.id === taskId) return "ring-2 ring-primary/70";
-    if (dragOver?.id === taskId) return "border-primary/60 bg-primary/5";
+    if (dropTarget?.id === taskId && dropTarget.category === category) {
+      return dropTarget.position === "before"
+        ? "border-t-2 border-primary/70"
+        : "border-b-2 border-primary/70";
+    }
     return "";
   };
 
@@ -257,12 +270,14 @@ export default function TODOPage() {
                   className="divide-y divide-base-300"
                   onDragOver={(e) => {
                     e.preventDefault();
-                    const lastId = orderedByCat[cat][orderedByCat[cat].length - 1]?.id;
-                    setDragOver(dragging && lastId ? { id: lastId, category: cat } : null);
+                    const lastId = orderedByCat[cat][orderedByCat[cat].length - 1]?.id ?? null;
+                    if (dragging && dragging.category === cat) {
+                      setDropTarget({ id: lastId, category: cat, position: "after" });
+                    }
                   }}
                   onDrop={(e) => {
                     e.preventDefault();
-                    void handleDrop(cat, null);
+                    void handleDrop(cat, dropTarget?.id ?? null, dropTarget?.position ?? "after");
                   }}
                 >
                   {orderedByCat[cat].map((t) => {
@@ -278,25 +293,37 @@ export default function TODOPage() {
                         key={t.id}
                         className={`p-3 transition ${dragIndicator(t.id, cat)}`}
                         draggable
-                        onDragStart={() => setDragging({ id: t.id, category: cat })}
-                        onDragEnter={() => setDragOver({ id: t.id, category: cat })}
+                        onDragStart={(e) => {
+                          e.dataTransfer?.setData("text/plain", t.id);
+                          e.dataTransfer?.setDragImage(e.currentTarget, 10, 10);
+                          e.dataTransfer.effectAllowed = "move";
+                          setDragging({ id: t.id, category: cat });
+                        }}
+                        onDragEnter={(e) => {
+                          const { top, height } = e.currentTarget.getBoundingClientRect();
+                          const before = e.clientY < top + height / 2;
+                          setDropTarget({ id: t.id, category: cat, position: before ? "before" : "after" });
+                        }}
                         onDragOver={(e) => {
                           e.preventDefault();
-                          setDragOver({ id: t.id, category: cat });
+                          const { top, height } = e.currentTarget.getBoundingClientRect();
+                          const before = e.clientY < top + height / 2;
+                          setDropTarget({ id: t.id, category: cat, position: before ? "before" : "after" });
                         }}
                         onDrop={(e) => {
                           e.preventDefault();
-                          void handleDrop(cat, t.id);
+                          const pos = dropTarget?.position ?? "after";
+                          void handleDrop(cat, t.id, pos);
                         }}
                         onDragEnd={() => {
                           setDragging(null);
-                          setDragOver(null);
+                          setDropTarget(null);
                         }}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-base-200 text-[10px] uppercase text-base-content/70 shadow-inner">
+                              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-base-200 text-[10px] uppercase text-base-content/70 shadow-inner cursor-grab active:cursor-grabbing">
                                 :::
                               </span>
                               <div className="font-medium">{t.title}</div>

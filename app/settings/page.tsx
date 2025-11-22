@@ -8,6 +8,8 @@ import {
 } from "@/app/DesignSystem/context/DesignProvider";
 import { exportJSON, importJSON, loadData } from "@/app/apollo/lib/store";
 import { THEMES, type Theme } from "@/app/DesignSystem/theme";
+import SettingsPermissionsTab from "./SettingsPermissionsTab";
+import { useAuthSnapshot } from "@/lib/auth-client";
 import {
   resetViews,
   getTagsMap,
@@ -39,7 +41,7 @@ type ManifestResponse = {
   items?: GalleryItem[];
 };
 
-type TabId = "appearance" | "gallery" | "profiles" | "users";
+type TabId = "appearance" | "gallery" | "user" | "permissions";
 
 async function fetchGalleryManifest(): Promise<GalleryItem[]> {
   // Prefer the live API scan so freshly added media shows up immediately.
@@ -72,6 +74,12 @@ async function fetchGalleryManifest(): Promise<GalleryItem[]> {
 
 export default function SettingsPage() {
   const { theme, setTheme, button, setButton, search, setSearch } = useDesign();
+  const { profile: authProfile } = useAuthSnapshot();
+  const authName =
+    authProfile?.name ??
+    (authProfile?.email ? authProfile.email.split("@")[0] : null);
+  const authEmail = authProfile?.email ?? null;
+
 
   const [syncing, setSyncing] = useState(false);
   const [autoTagging, setAutoTagging] = useState(false);
@@ -84,7 +92,8 @@ export default function SettingsPage() {
   const availableTabs = useMemo(() => {
     const tabs: Array<{ id: TabId; label: string }> = [
       { id: "appearance", label: "Appearance" },
-      { id: "profiles", label: "Profiles" },
+      { id: "user", label: "User" },
+      { id: "permissions", label: "Permissions" },
       { id: "gallery", label: "Gallery" },
       // Users tab removed to avoid server-side admin calls when proxy is not configured
     ];
@@ -356,10 +365,33 @@ export default function SettingsPage() {
           </>
         )}
 
-        {activeTab === "profiles" && (
-          <>
-            <ProfilesCard />
-          </>
+        {activeTab === "user" && (
+          <section className="space-y-3 rounded-lg border gaia-border p-4">
+            <h2 className="font-medium">User</h2>
+            {authEmail ? (
+              <div className="space-y-1">
+                <p className="text-sm">
+                  Signed in as{" "}
+                  <span className="font-semibold">
+                    {authName ?? authEmail}
+                  </span>
+                </p>
+                <p className="text-xs gaia-muted">{authEmail}</p>
+              </div>
+            ) : (
+              <p className="text-sm gaia-muted">
+                No Supabase user is currently signed in.
+              </p>
+            )}
+            <p className="text-xs gaia-muted">
+              This uses your Supabase auth profile. Change it by signing in or
+              out from GAIA.
+            </p>
+          </section>
+        )}
+
+        {activeTab === "permissions" && (
+          <SettingsPermissionsTab />
         )}
 
         {activeTab === "gallery" && (

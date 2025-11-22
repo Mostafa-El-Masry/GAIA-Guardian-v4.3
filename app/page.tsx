@@ -112,7 +112,7 @@ export default function HomePage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="gaia-glass octagon-link absolute left-1/2 top-1/2 w-32 px-6 py-3 text-center text-lg font-medium backdrop-blur transition whitespace-nowrap"
+                className="gaia-glass octagon-link absolute left-1/2 top-1/2 flex items-center justify-center w-32 px-6 py-3 text-center text-lg font-medium backdrop-blur transition whitespace-nowrap"
                 style={style}
               >
                 {link.label}

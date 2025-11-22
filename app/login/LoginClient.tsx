@@ -14,20 +14,14 @@ interface LoginClientProps {
 }
 
 // GAIA Level 3 – Multi-user & Permissions
-// Version 4.3 · Auth Fix
+// Version 4.3 · Auth · Email verify + name
 //
 // LoginClient
 // -----------
 // Combined Sign-in / Create-account / Guest entry UI.
-// - "Create one" switches to signup mode on the same page.
-// - "Sign in" switches back.
-// - initialMode is controlled by the /login route via searchParams.mode
-//   so links like /login?mode=signup open directly on the create form.
-//
-// Signup uses Supabase email+password signUp (with name in metadata).
-// "Continue as guest" creates a GAIA internal user with role "guest"
-// via /api/users, with all permissions = false, and marks it as
-// the active user in localStorage.
+// Adds:
+//   • email confirmation gating on sign-in using user.email_confirmed_at
+//   • keeps initialMode wiring for /login?mode=signin|signup
 
 const LoginClient: React.FC<LoginClientProps> = ({
   className = '',
@@ -37,7 +31,7 @@ const LoginClient: React.FC<LoginClientProps> = ({
   const supabase = createClientComponentClient();
   const [mode, setMode] = useState<Mode>(initialMode);
 
-  // If searchParams.mode changes (via the page wrapper), keep in sync.
+  // Keep local mode in sync with route query (?mode=)
   useEffect(() => {
     setMode(initialMode);
   }, [initialMode]);
@@ -68,6 +62,27 @@ const LoginClient: React.FC<LoginClientProps> = ({
       if (signInError) {
         throw signInError;
       }
+
+      // Extra gate: make sure email is confirmed.
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        throw userError;
+      }
+      const user = userData?.user ?? null;
+
+      // If email confirmation is enabled in Supabase, this will be null
+      // until the user clicks the email link. If confirmations are disabled,
+      // Supabase sets this automatically.
+      const confirmedAt = (user as any)?.email_confirmed_at;
+      if (!confirmedAt) {
+        // Not confirmed → immediately sign out again and show message.
+        await supabase.auth.signOut();
+        setError(
+          'Your email is not verified yet. Please check your inbox for a verification email, confirm it, and then sign in again.'
+        );
+        return;
+      }
+
       router.refresh();
       router.push('/');
     } catch (err: any) {
@@ -111,13 +126,15 @@ const LoginClient: React.FC<LoginClientProps> = ({
           data: {
             full_name: name.trim(),
           },
+          // Optional: you can set a custom redirect URL in Supabase dashboard.
+          // emailRedirectTo: `${window.location.origin}/login?mode=signin`,
         },
       });
       if (signUpError) {
         throw signUpError;
       }
 
-      // Keep GAIA internal users table in sync (best-effort).
+      // Best-effort: keep GAIA internal users table in sync.
       try {
         await fetch('/api/users', {
           method: 'POST',
@@ -140,14 +157,13 @@ const LoginClient: React.FC<LoginClientProps> = ({
 
       if (data?.user?.id) {
         setInfo(
-          'Account created. If email confirmation is required, please check your inbox for a verification email.'
+          'Account created. Please check your email for a verification link before signing in.'
         );
       } else {
         setInfo(
           'Sign-up request sent. If email confirmation is enabled, you should receive an email shortly.'
         );
       }
-      // After creating account, go back to sign-in mode.
       setMode('signin');
     } catch (err: any) {
       setError(err?.message ?? 'Failed to create account.');
